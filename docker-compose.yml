@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  # The Data Structures and Algorithoms Application
+  dsna_server:
+    container_name: dsna_server_container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - "9003:8000"
+    volumes:
+      - ./:/app
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      - DB_HOST=dsna_db
+    working_dir: /app
+    # command: php -S 0.0.0.0:8000 -t public
+    command: php -S 0.0.0.0:8000
+
+  # The Database
+  dsna_db:
+    container_name: dsna_db
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_DATABASE=sppublicdemo_db
+      - MYSQL_ROOT_PASSWORD=password
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3373:3306"
+
+  # PHPMyAdmin
+  dsna_phpmyadmin:
+    container_name: dsna_phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "9093:80"
+    depends_on:
+      - dsna_db
